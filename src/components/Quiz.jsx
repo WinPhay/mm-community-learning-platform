@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
-export default function Quiz({ questions }) {
+export default function Quiz({ questions, onComplete }) {
   const [selectedAnswers, setSelectedAnswers] = useState({})
 
   const answeredCount = Object.keys(selectedAnswers).length
@@ -14,6 +14,17 @@ export default function Quiz({ questions }) {
       return total + Number(selectedAnswers[index] === question.answer)
     }, 0)
   }, [questions, selectedAnswers])
+
+  useEffect(() => {
+    if (!questions.length || answeredCount !== totalQuestions || !onComplete) {
+      return
+    }
+
+    onComplete({
+      score,
+      totalQuestions,
+    })
+  }, [answeredCount, onComplete, questions.length, score, totalQuestions])
 
   function answer(questionIndex, choiceIndex) {
     setSelectedAnswers((current) => {

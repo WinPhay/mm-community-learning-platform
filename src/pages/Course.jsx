@@ -2,14 +2,17 @@ import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 
+import { useAuth } from "../context/AuthContext"
 import { useLang } from "../context/LangContext"
 import LangSwitcher from "../components/LangSwitcher"
 import Quiz from "../components/Quiz"
 import { loadLesson, loadManifest, loadQuiz } from "../utils/loader"
+import { saveProgress } from "../utils/progress"
 
 export default function Course() {
   const { id } = useParams()
   const { lang } = useLang()
+  const { user } = useAuth()
 
   const [manifest, setManifest] = useState(null)
   const [lesson, setLesson] = useState("")
@@ -17,6 +20,11 @@ export default function Course() {
   const [chapterIndex, setChapterIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("")
+  const [progressState, setProgressState] = useState({
+    status: "idle",
+    savedChapterId: "",
+    message: "",
+  })
 
   useEffect(() => {
     let isActive = true
@@ -48,6 +56,14 @@ export default function Course() {
     }
   }, [id, lang])
 
+  useEffect(() => {
+    setProgressState({
+      status: "idle",
+      savedChapterId: "",
+      message: "",
+    })
+  }, [id, lang, chapterIndex])
+
   async function loadChapter(nextManifest, nextIndex, isActive = true) {
     const chapter = nextManifest.chapters[nextIndex]
 
@@ -76,6 +92,42 @@ export default function Course() {
     setIsLoading(true)
     setError("")
     await loadChapter(manifest, nextIndex)
+  }
+
+  async function handleQuizComplete({ score, totalQuestions }) {
+    if (!user || !manifest) {
+      setProgressState({
+        status: "guest",
+        savedChapterId: chapter.id,
+        message: "Sign in to save quiz progress across devices.",
+      })
+      return
+    }
+
+    if (progressState.savedChapterId === chapter.id) {
+      return
+    }
+
+    try {
+      await saveProgress({
+        userId: user.id,
+        courseId: manifest.id,
+        chapterId: chapter.id,
+        score: totalQuestions ? Math.round((score / totalQuestions) * 100) : 0,
+      })
+
+      setProgressState({
+        status: "saved",
+        savedChapterId: chapter.id,
+        message: "Progress saved to your account.",
+      })
+    } catch {
+      setProgressState({
+        status: "error",
+        savedChapterId: "",
+        message: "We couldn't save this result right now.",
+      })
+    }
   }
 
   if (error) {
@@ -136,6 +188,20 @@ export default function Course() {
                 Move through lessons at your own pace, switch language anytime,
                 and keep your place with a clear course progress tracker.
               </p>
+              <div className="flex flex-wrap gap-3 text-xs text-slate-300">
+                {user ? (
+                  <span className="rounded-full border border-emerald-300/20 bg-emerald-400/10 px-3 py-1.5 text-emerald-100">
+                    Syncing as {user.email}
+                  </span>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10"
+                  >
+                    Sign in to save progress
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
 
@@ -260,7 +326,24 @@ export default function Course() {
             </div>
           </article>
 
-          <Quiz key={`${id}-${lang}-${chapter.id}`} questions={quiz} />
+          <Quiz
+            key={`${id}-${lang}-${chapter.id}`}
+            questions={quiz}
+            onComplete={handleQuizComplete}
+          />
+          {progressState.message ? (
+            <div
+              className={`rounded-[1.5rem] border px-5 py-4 text-sm ${
+                progressState.status === "saved"
+                  ? "border-emerald-300/20 bg-emerald-400/10 text-emerald-100"
+                  : progressState.status === "error"
+                    ? "border-rose-300/20 bg-rose-400/10 text-rose-100"
+                    : "border-white/10 bg-white/5 text-slate-300"
+              }`}
+            >
+              {progressState.message}
+            </div>
+          ) : null}
         </main>
       </div>
     </div>
