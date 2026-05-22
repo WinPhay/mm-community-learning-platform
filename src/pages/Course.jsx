@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import ReactMarkdown from "react-markdown"
 
+import { mdxComponents } from "../components/lesson/LessonComponents"
 import { useAuth } from "../context/AuthContext"
 import { useLang } from "../context/LangContext"
 import LangSwitcher from "../components/LangSwitcher"
@@ -15,7 +15,7 @@ export default function Course() {
   const { user } = useAuth()
 
   const [manifest, setManifest] = useState(null)
-  const [lesson, setLesson] = useState("")
+  const [LessonContent, setLessonContent] = useState(null)
   const [quiz, setQuiz] = useState([])
   const [chapterIndex, setChapterIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -75,7 +75,7 @@ export default function Course() {
 
       if (!isActive) return
 
-      setLesson(lessonText)
+      setLessonContent(() => lessonText)
       setQuiz(quizData)
       setChapterIndex(nextIndex)
       setIsLoading(false)
@@ -300,7 +300,9 @@ export default function Course() {
             </div>
 
             <div className="lesson-content mt-6">
-              <ReactMarkdown>{lesson}</ReactMarkdown>
+              {LessonContent ? (
+                <LessonContent components={mdxComponents} />
+              ) : null}
             </div>
 
             <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">

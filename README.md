@@ -3,7 +3,7 @@
 A React + Vite learning app for crypto education with:
 
 - a polished home page and course library
-- lesson rendering from markdown files
+- lesson rendering from MDX files
 - multilingual course content
 - interactive quizzes
 - Supabase authentication
@@ -19,7 +19,7 @@ A React + Vite learning app for crypto education with:
 - React Router
 - Tailwind CSS
 - Supabase
-- React Markdown
+- MDX via Vite
 
 ## Getting Started
 
@@ -67,7 +67,7 @@ yarn lint
 - [src/utils/profile.js](/D:/projects/TypeScript/crypto-ebook-template/src/utils/profile.js:1): profile fetch, update, and avatar upload helpers
 - [src/utils/progress.js](/D:/projects/TypeScript/crypto-ebook-template/src/utils/progress.js:1): saves quiz completion to Supabase
 - `supabase/migrations/...`: profile table, avatar storage, and theme schema changes
-- `public/courses/...`: course manifests, lessons, and quiz content
+- `src/content/courses/...`: course manifests, MDX lessons, and quiz content
 
 ## Supabase Notes
 
@@ -143,6 +143,42 @@ The project includes a `homepage` field in [package.json](/D:/projects/TypeScrip
 - the `homepage` value is updated to your real repository URL
 - your Supabase env vars are configured in the deployment environment
 - the hosted app can access your course content and Supabase project
+
+## Authoring Lessons
+
+Lessons now use `.mdx` files under `src/content/courses/<course-id>/lessons/<lang>/`.
+
+That means you can mix normal Markdown with reusable React components such as:
+
+- `<Callout title="..." tone="info|success|warning|danger">...</Callout>`
+- `<StatGrid>` with nested `<StatCard label="..." value="...">...</StatCard>`
+- `<Glossary>` with nested `<GlossaryItem term="...">...</GlossaryItem>`
+- `<ExternalImage src="..." alt="..." caption="..."/>`
+- `<YouTubeEmbed url="https://youtu.be/..." title="..." caption="..."/>`
+
+Example:
+
+```mdx
+# Wallet Safety
+
+<Callout title="Important" tone="warning">
+  Never share your recovery phrase.
+</Callout>
+
+<ExternalImage
+  src="https://i.imgur.com/example.png"
+  alt="Example wallet screen"
+  caption="A simple wallet interface example."
+/>
+
+<YouTubeEmbed
+  url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  title="Wallet basics walkthrough"
+  caption="A short explainer video embedded from YouTube."
+/>
+```
+
+The shared MDX component mapping lives in [src/components/lesson/LessonComponents.jsx](/D:/projects/TypeScript/crypto-ebook-template/src/components/lesson/LessonComponents.jsx:1).
 
 ## Notes
 

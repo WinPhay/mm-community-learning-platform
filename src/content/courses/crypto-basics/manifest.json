@@ -13,7 +13,7 @@
         "my": "မိတ်ဆက်",
         "zh": "介绍"
       },
-      "lesson": "intro.md",
+      "lesson": "intro.mdx",
       "quiz": "intro.json"
     }
   ]
