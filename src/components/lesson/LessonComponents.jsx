@@ -2,14 +2,11 @@ import Callout from "./Callout"
 import { Glossary, GlossaryItem } from "./Glossary"
 import { ExternalImage, YouTubeEmbed } from "./Media"
 import { StatCard, StatGrid } from "./StatGrid"
-<<<<<<< HEAD
-=======
 import AdvancedChart from "../tradingview/AdvancedChart"
 import PriceChart from "../charts/PriceChart"
 import SimulatorChart from "../charts/SimulatorChart"
 import SymbolOverview from "../tradingview/SymbolOverview"
 import TickerTape from "../tradingview/TickerTape"
->>>>>>> upstream/main
 
 function createHeading(tagName, className) {
   return function Heading({ children }) {
@@ -68,12 +65,9 @@ export const mdxComponents = {
   StatGrid,
   StatCard,
   YouTubeEmbed,
-<<<<<<< HEAD
-=======
   PriceChart,
   SimulatorChart,
   AdvancedChart,
   SymbolOverview,
   TickerTape,
->>>>>>> upstream/main
 }
